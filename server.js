@@ -12,6 +12,11 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Validate required environment variables
+if (!process.env.SESSION_SECRET) {
+  console.warn('WARNING: SESSION_SECRET not set. Using default (not recommended for production)');
+}
+
 // Session configuration
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key-change-this',
@@ -68,17 +73,14 @@ async function checkPOP3Mail() {
     oauth2Client.setCredentials(userConfig.tokens);
     const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
 
-    // Get Gmail settings to check POP3 accounts
-    const settings = await gmail.users.settings.pop.list({ userId: 'me' });
-    
     // The Gmail API doesn't have a direct "check mail now" endpoint for POP3
-    // Instead, we'll use a workaround by triggering a label check which often triggers POP3 check
+    // Instead, we'll use a workaround by triggering API calls which often trigger POP3 check
     // This simulates what the browser extension does
     
     // Get list of labels to trigger a refresh
     await gmail.users.labels.list({ userId: 'me' });
     
-    // Alternative: We can also trigger by checking messages with a specific query
+    // Also trigger by checking messages with a specific query
     await gmail.users.messages.list({
       userId: 'me',
       maxResults: 1,
