@@ -1,0 +1,22 @@
+{
+  "name": "pop3refresh",
+  "version": "1.0.0",
+  "description": "Gmail POP3 Auto-Refresh Web Application - Automatically check POP3 mail accounts in Gmail without keeping browser open",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["gmail", "pop3", "auto-refresh", "email", "automation"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "express-session": "^1.18.2",
+    "googleapis": "^169.0.0",
+    "node-cron": "^4.2.1",
+    "sqlite3": "^5.1.7"
+  }
+}

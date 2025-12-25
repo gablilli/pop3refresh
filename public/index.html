@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gmail POP3 Auto-Refresh</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📧 Gmail POP3 Auto-Refresh</h1>
+            <p class="subtitle">Automatically check POP3 mail accounts in Gmail without keeping your browser open</p>
+        </header>
+
+        <div id="message" class="message"></div>
+
+        <div class="card" id="status-card">
+            <h2>Status</h2>
+            <div class="status-grid">
+                <div class="status-item">
+                    <span class="status-label">Authentication:</span>
+                    <span id="auth-status" class="status-value">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Auto-Check:</span>
+                    <span id="enabled-status" class="status-value">Checking...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Check Interval:</span>
+                    <span id="interval-status" class="status-value">-</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="auth-card">
+            <h2>🔐 Authentication</h2>
+            <p>Connect your Gmail account to enable automatic POP3 mail checking.</p>
+            <button id="auth-button" class="button primary">Connect Gmail Account</button>
+            <button id="logout-button" class="button secondary" style="display: none;">Disconnect Account</button>
+        </div>
+
+        <div class="card" id="config-card" style="display: none;">
+            <h2>⚙️ Configuration</h2>
+            <div class="form-group">
+                <label for="check-interval">Check Interval (minutes):</label>
+                <input type="number" id="check-interval" min="1" max="60" value="5">
+                <small>How often to check for new POP3 mail (1-60 minutes)</small>
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="enabled-toggle">
+                    <span>Enable Automatic Checking</span>
+                </label>
+            </div>
+            <button id="save-config" class="button primary">Save Configuration</button>
+            <button id="check-now" class="button secondary">Check Mail Now</button>
+        </div>
+
+        <div class="card">
+            <h2>ℹ️ How It Works</h2>
+            <ol>
+                <li><strong>Connect</strong> your Gmail account using Google OAuth2 (secure authentication)</li>
+                <li><strong>Configure</strong> how often you want to check for new POP3 mail</li>
+                <li><strong>Enable</strong> automatic checking - the app will run in the background</li>
+                <li><strong>Close</strong> your browser - the server continues checking your mail automatically</li>
+            </ol>
+            <p class="note">
+                <strong>Note:</strong> This app replicates the functionality of the Gmail POP3 auto-refresh browser extension,
+                but runs as a standalone server so you don't need to keep your browser open.
+            </p>
+        </div>
+
+        <footer>
+            <p>Based on <a href="https://github.com/Ayce45/gmail-pop3-auto-refresh" target="_blank">gmail-pop3-auto-refresh</a> extension</p>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
