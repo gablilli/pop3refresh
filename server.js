@@ -20,6 +20,12 @@ if (!process.env.SESSION_SECRET) {
 }
 
 // Rate limiting configuration
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200, // Limit each IP to 200 requests per windowMs for general routes
+  message: 'Too many requests from this IP, please try again later.'
+});
+
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
@@ -135,7 +141,7 @@ function updateScheduler() {
 }
 
 // Routes
-app.get('/', (req, res) => {
+app.get('/', generalLimiter, (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
