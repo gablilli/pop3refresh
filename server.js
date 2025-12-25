@@ -1,5 +1,6 @@
 const express = require('express');
 const session = require('express-session');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 const dotenv = require('dotenv');
 const { OAuth2Client } = require('google-auth-library');
@@ -11,18 +12,36 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Validate required environment variables
 if (!process.env.SESSION_SECRET) {
   console.warn('WARNING: SESSION_SECRET not set. Using default (not recommended for production)');
 }
 
+// Rate limiting configuration
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.'
+});
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 auth attempts per windowMs
+  message: 'Too many authentication attempts from this IP, please try again later.'
+});
+
 // Session configuration
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key-change-this',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false } // Set to true if using HTTPS
+  cookie: { 
+    secure: NODE_ENV === 'production', // Use secure cookies in production
+    httpOnly: true,
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
 }));
 
 app.use(express.json());
@@ -120,7 +139,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-app.get('/api/status', (req, res) => {
+app.get('/api/status', apiLimiter, (req, res) => {
   res.json({
     authenticated: !!userConfig.tokens,
     enabled: userConfig.enabled,
@@ -129,7 +148,7 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-app.get('/api/auth', (req, res) => {
+app.get('/api/auth', authLimiter, (req, res) => {
   const authUrl = oauth2Client.generateAuthUrl({
     access_type: 'offline',
     scope: [
@@ -141,7 +160,7 @@ app.get('/api/auth', (req, res) => {
   res.json({ authUrl });
 });
 
-app.get('/oauth2callback', async (req, res) => {
+app.get('/oauth2callback', authLimiter, async (req, res) => {
   const { code } = req.query;
   
   if (!code) {
@@ -160,7 +179,7 @@ app.get('/oauth2callback', async (req, res) => {
   }
 });
 
-app.post('/api/config', (req, res) => {
+app.post('/api/config', apiLimiter, (req, res) => {
   const { enabled, checkInterval } = req.body;
   
   if (typeof enabled === 'boolean') {
@@ -177,12 +196,12 @@ app.post('/api/config', (req, res) => {
   res.json({ success: true, config: userConfig });
 });
 
-app.post('/api/check-now', async (req, res) => {
+app.post('/api/check-now', apiLimiter, async (req, res) => {
   const result = await checkPOP3Mail();
   res.json(result);
 });
 
-app.post('/api/logout', (req, res) => {
+app.post('/api/logout', apiLimiter, (req, res) => {
   userConfig.tokens = null;
   userConfig.enabled = false;
   saveConfig();

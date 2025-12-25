@@ -8,12 +8,19 @@
     "dev": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["gmail", "pop3", "auto-refresh", "email", "automation"],
+  "keywords": [
+    "gmail",
+    "pop3",
+    "auto-refresh",
+    "email",
+    "automation"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.2.1",
     "express-session": "^1.18.2",
     "googleapis": "^169.0.0",
     "node-cron": "^4.2.1"
